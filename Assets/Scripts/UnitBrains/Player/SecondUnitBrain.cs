@@ -18,7 +18,7 @@ namespace UnitBrains.Player
         private bool _overheated;
         private List<Vector2Int> outOfRangeTargets = new List<Vector2Int>();
         private static int counter = 0;
-        private int unitCounter;
+        private int unitCounter = ++counter;
         private int maxTargets = 3;
 
 
@@ -50,49 +50,30 @@ namespace UnitBrains.Player
             Vector2Int enemyBase = runtimeModel.RoMap.Bases[
             IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId];
 
-            Vector2Int minTarget = Vector2Int.zero;
-            float min = float.MaxValue;
-
             List<Vector2Int> result = new List<Vector2Int>();
-            result.Clear();
+            outOfRangeTargets.Clear();
 
             foreach (Vector2Int target in GetAllTargets())
             {
-
-                float DistanceToBase = DistanceToOwnBase(target);
-
-                if (DistanceToBase < min)
-                {
-                    min = DistanceToBase;
-                    minTarget = target;
-                }
-
+                outOfRangeTargets.Add(target);
             }
 
-            result.Add(minTarget);
-
-            if (result.Count == 0)
+            if (outOfRangeTargets.Count == 0)
             {
-                result.Add(enemyBase);
+                outOfRangeTargets.Add(enemyBase);
             }
 
-            SortByDistanceToOwnBase(result);
+            SortByDistanceToOwnBase(outOfRangeTargets);
 
-            for (int counter = 0; counter < maxTargets; counter++)
-            {
-                if (min < float.MaxValue)
-                {
-                    if (IsTargetInRange(minTarget))
-                    {
-                        result.Add(minTarget);
-                    }
-                    outOfRangeTargets.Add(minTarget);
-                }
-            }
+            int targetNum = unitCounter % counter;
+            int bestTargetNum = Mathf.Min(targetNum, outOfRangeTargets.Count - 1);
+            Vector2Int bestTarget = outOfRangeTargets[bestTargetNum];
+
+            if (IsTargetInRange(bestTarget)) result.Add(bestTarget);
 
             return result;
-
         }
+
 
         public override Vector2Int GetNextStep()
         {
