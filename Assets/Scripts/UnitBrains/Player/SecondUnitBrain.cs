@@ -65,7 +65,7 @@ namespace UnitBrains.Player
 
             SortByDistanceToOwnBase(outOfRangeTargets);
 
-            int targetNum = unitCounter % counter;
+            int targetNum = unitCounter % maxTargets;
             int bestTargetNum = Mathf.Min(targetNum, outOfRangeTargets.Count - 1);
             Vector2Int bestTarget = outOfRangeTargets[bestTargetNum];
 
